@@ -17,6 +17,24 @@
   var YELLOW_HEART_COUNT_MAX = yhc.max;
   var RED_HEART_BURST = CONFIG.heartBurst || {};
 
+  var dom = {};
+  function cacheDom() {
+    dom.dayMeta = document.getElementById("dayMeta");
+    dom.dayLabel = document.getElementById("dayLabel");
+    dom.videoWrap = document.getElementById("videoWrap");
+    dom.videoPlaceholder = document.getElementById("videoPlaceholder");
+    dom.linkYesterday = document.getElementById("linkYesterday");
+    dom.linkTomorrow = document.getElementById("linkTomorrow");
+    dom.navSep = document.getElementById("navSep");
+    dom.photoWrap = document.getElementById("photoWrap");
+    dom.floatEmojis = document.getElementById("floatEmojis");
+    dom.musicHeartsFloat = document.getElementById("musicHeartsFloat");
+    dom.starfield = document.getElementById("starfield");
+    dom.floatNames = document.getElementById("floatNames");
+  }
+  var cachedAudioList = [];
+  cacheDom();
+
   function secureRandom() {
     if (typeof crypto !== "undefined" && crypto.getRandomValues) {
       return crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000;
@@ -45,10 +63,11 @@
   }
 
   function initFloatNames() {
-    var container = document.getElementById("floatNames");
+    var container = dom.floatNames;
     if (!container || !PERSONAL.fromName || !PERSONAL.toName) return;
     var names = [PERSONAL.fromName, PERSONAL.toName];
     var count = CONFIG.floatNamesCount != null ? CONFIG.floatNamesCount : 10;
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < count; i++) {
       var span = document.createElement("span");
       span.className = "float-name " + (i % 2 === 0 ? "from-name" : "to-name");
@@ -63,14 +82,16 @@
         "animation-delay: " + delay.toFixed(1) + "s; " +
         "--drift: " + drift.toFixed(0) + "px;"
       );
-      container.appendChild(span);
+      frag.appendChild(span);
     }
+    container.appendChild(frag);
   }
 
   function initStarfield() {
-    var container = document.getElementById("starfield");
+    var container = dom.starfield;
     if (!container) return;
     var count = CONFIG.starCount != null ? CONFIG.starCount : 60;
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < count; i++) {
       var star = document.createElement("span");
       star.className = "star";
@@ -79,20 +100,27 @@
       star.style.width = star.style.height = randomBetween(1, 2.5) + "px";
       star.style.animationDelay = randomBetween(0, 4) + "s";
       star.style.opacity = randomBetween(0.25, 0.85);
-      container.appendChild(star);
+      frag.appendChild(star);
     }
+    container.appendChild(frag);
   }
 
   function renderEmojis(dayIndex) {
-    var container = document.getElementById("floatEmojis");
+    var container = dom.floatEmojis;
+    if (!container) return;
     var list = EMOJI_CONFIG[dayIndex] || EMOJI_CONFIG[1];
     container.innerHTML = "";
-    for (var i = 0; i < (EMOJI_COUNT != null ? EMOJI_COUNT : 20); i++) {
+    var cap = EMOJI_COUNT != null ? EMOJI_COUNT : 20;
+    var dMin = FLOAT_EMOJI_DURATION_MIN != null ? FLOAT_EMOJI_DURATION_MIN : 22;
+    var dMax = FLOAT_EMOJI_DURATION_MAX != null ? FLOAT_EMOJI_DURATION_MAX : 28;
+    var delayMax = FLOAT_EMOJI_DELAY_MAX != null ? FLOAT_EMOJI_DELAY_MAX : 28;
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < cap; i++) {
       var span = document.createElement("span");
       span.className = "float-emoji";
       var x = randomBetween(1, 99);
-      var duration = randomBetween(FLOAT_EMOJI_DURATION_MIN != null ? FLOAT_EMOJI_DURATION_MIN : 22, FLOAT_EMOJI_DURATION_MAX != null ? FLOAT_EMOJI_DURATION_MAX : 28);
-      var delay = -randomBetween(0, FLOAT_EMOJI_DELAY_MAX != null ? FLOAT_EMOJI_DELAY_MAX : 28);
+      var duration = randomBetween(dMin, dMax);
+      var delay = -randomBetween(0, delayMax);
       var drift = randomBetween(-20, 20);
       span.setAttribute("style",
         "left: " + x + "%; " +
@@ -101,8 +129,9 @@
         "--drift: " + drift.toFixed(0) + "px;"
       );
       span.textContent = pickRandom(list);
-      container.appendChild(span);
+      frag.appendChild(span);
     }
+    container.appendChild(frag);
   }
 
   function getTodayDayIndex() {
@@ -159,23 +188,23 @@
   }
 
   function pauseAllMusic() {
-    var allAudios = document.querySelectorAll(".music-hearts-float ~ audio");
-    for (var i = 0; i < allAudios.length; i++) {
-      allAudios[i].pause();
-      allAudios[i].currentTime = 0;
+    for (var i = 0; i < cachedAudioList.length; i++) {
+      cachedAudioList[i].pause();
+      cachedAudioList[i].currentTime = 0;
     }
-    document.querySelectorAll(".music-emoji").forEach(function (b) { b.classList.remove("playing"); });
+    var musicBtns = dom.musicHeartsFloat ? dom.musicHeartsFloat.querySelectorAll(".music-emoji") : [];
+    for (var j = 0; j < musicBtns.length; j++) musicBtns[j].classList.remove("playing");
   }
 
   function render() {
-    var dayMetaEl = document.getElementById("dayMeta");
-    var dayLabelEl = document.getElementById("dayLabel");
-    var videoWrap = document.getElementById("videoWrap");
-    var videoPlaceholder = document.getElementById("videoPlaceholder");
-    var linkYesterdayEl = document.getElementById("linkYesterday");
-    var linkTomorrowEl = document.getElementById("linkTomorrow");
-    var navSepEl = document.getElementById("navSep");
-    var photoWrap = document.getElementById("photoWrap");
+    var dayMetaEl = dom.dayMeta;
+    var dayLabelEl = dom.dayLabel;
+    var videoWrap = dom.videoWrap;
+    var videoPlaceholder = dom.videoPlaceholder;
+    var linkYesterdayEl = dom.linkYesterday;
+    var linkTomorrowEl = dom.linkTomorrow;
+    var navSepEl = dom.navSep;
+    var photoWrap = dom.photoWrap;
 
     if (PERSONAL.photoUrl) {
       photoWrap.innerHTML = "<img src=\"" + PERSONAL.photoUrl + "\" alt=\"\" class=\"photo\">";
@@ -253,6 +282,8 @@
     var wrap = document.createElement("div");
     wrap.className = "confetti-wrap";
     var count = CONFIG.confettiCount != null ? CONFIG.confettiCount : 30;
+    var colors = ["#e8b4bc", "#f0c8d0", "#d06070", "#ffb6c1"];
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < count; i++) {
       var p = document.createElement("span");
       p.className = "confetti-particle";
@@ -261,9 +292,10 @@
       p.style.setProperty("--tx", (randomBetween(-100, 100)) + "px");
       p.style.setProperty("--ty", (randomBetween(-150, -250)) + "px");
       p.style.setProperty("--rot", randomBetween(0, 360) + "deg");
-      p.style.color = pickRandom(["#e8b4bc", "#f0c8d0", "#d06070", "#ffb6c1"]);
-      wrap.appendChild(p);
+      p.style.color = pickRandom(colors);
+      frag.appendChild(p);
     }
+    wrap.appendChild(frag);
     document.body.appendChild(wrap);
     setTimeout(function () { removeEl(wrap); }, 2800);
   }
@@ -276,6 +308,7 @@
     wrap.style.top = originY + "px";
     wrap.style.transform = "translate(-50%, -50%)";
     var count = CONFIG.heartBurstParticleCount != null ? CONFIG.heartBurstParticleCount : 25;
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < count; i++) {
       var p = document.createElement("span");
       p.className = "heart-burst-particle";
@@ -285,8 +318,9 @@
       p.style.setProperty("--ty", (randomBetween(-180, -80)) + "px");
       p.style.setProperty("--rot", randomBetween(0, 360) + "deg");
       p.style.color = color;
-      wrap.appendChild(p);
+      frag.appendChild(p);
     }
+    wrap.appendChild(frag);
     document.body.appendChild(wrap);
     setTimeout(function () { removeEl(wrap); }, 2600);
   }
@@ -301,20 +335,14 @@
     btn.textContent = "💛";
     btn.style.left = pos.left + "%";
     btn.style.top = pos.top + "%";
-    btn.addEventListener("click", function (ev) {
-      ev.stopPropagation();
-      fireHeartBurst(ev.clientX, ev.clientY, RED_HEART_BURST.color || "#e74c3c", RED_HEART_BURST.emoji || "\u2764\ufe0f");
-      removeEl(ev.currentTarget);
-      addYellowHeart(container);
-      addYellowHeart(container);
-    });
     container.appendChild(btn);
   }
 
   function initMusicHeartsFloat() {
-    var container = document.getElementById("musicHeartsFloat");
+    var container = dom.musicHeartsFloat;
     if (!container) return;
     var i, pos, btn, trackId;
+    var frag = document.createDocumentFragment();
     for (i = 0; i < MUSIC_TRACKS.length; i++) {
       pos = randomPositionAvoidCenter();
       btn = document.createElement("button");
@@ -324,46 +352,56 @@
       btn.textContent = MUSIC_TRACKS[i].emoji;
       btn.style.left = pos.left + "%";
       btn.style.top = pos.top + "%";
-      trackId = MUSIC_TRACKS[i].id;
-      btn.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        var id = ev.currentTarget.getAttribute("data-track-id");
-        var target = document.getElementById(id);
-        if (!target) return;
-        if (ev.currentTarget.classList.contains("playing")) {
-          target.pause();
-          target.currentTime = 0;
-          ev.currentTarget.classList.remove("playing");
-        } else {
-          if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
-            ytPlayer.pauseVideo();
-          }
-          var allAudios = document.querySelectorAll(".music-hearts-float ~ audio");
-          for (var j = 0; j < allAudios.length; j++) {
-            allAudios[j].pause();
-            allAudios[j].currentTime = 0;
-          }
-          document.querySelectorAll(".music-emoji").forEach(function (b) { b.classList.remove("playing"); });
-          var p = target.play();
-          if (p && typeof p.then === "function") p.catch(function () {});
-          ev.currentTarget.classList.add("playing");
-        }
-        pos = randomPositionAvoidCenter();
-        ev.currentTarget.style.left = pos.left + "%";
-        ev.currentTarget.style.top = pos.top + "%";
-      });
-      btn.setAttribute("data-track-id", trackId);
-      container.appendChild(btn);
+      btn.setAttribute("data-track-id", MUSIC_TRACKS[i].id);
+      frag.appendChild(btn);
     }
+    container.appendChild(frag);
     var yMin = YELLOW_HEART_COUNT_MIN != null ? YELLOW_HEART_COUNT_MIN : 3;
     var yMax = YELLOW_HEART_COUNT_MAX != null ? YELLOW_HEART_COUNT_MAX : 5;
     var yellowHeartCount = yMin + Math.floor(secureRandom() * (yMax - yMin + 1));
     for (i = 0; i < yellowHeartCount; i++) {
       addYellowHeart(container);
     }
+    container.addEventListener("click", function (ev) {
+      var heart = ev.target.closest(".heart-emoji");
+      if (heart) {
+        ev.stopPropagation();
+        fireHeartBurst(ev.clientX, ev.clientY, RED_HEART_BURST.color || "#e74c3c", RED_HEART_BURST.emoji || "\u2764\ufe0f");
+        removeEl(heart);
+        addYellowHeart(container);
+        addYellowHeart(container);
+        return;
+      }
+      var musicBtn = ev.target.closest(".music-emoji");
+      if (musicBtn) {
+        ev.stopPropagation();
+        var id = musicBtn.getAttribute("data-track-id");
+        var target = document.getElementById(id);
+        if (!target) return;
+        if (musicBtn.classList.contains("playing")) {
+          target.pause();
+          target.currentTime = 0;
+          musicBtn.classList.remove("playing");
+        } else {
+          if (ytPlayer && typeof ytPlayer.pauseVideo === "function") ytPlayer.pauseVideo();
+          for (var j = 0; j < cachedAudioList.length; j++) {
+            cachedAudioList[j].pause();
+            cachedAudioList[j].currentTime = 0;
+          }
+          var musicBtns = container.querySelectorAll(".music-emoji");
+          for (var k = 0; k < musicBtns.length; k++) musicBtns[k].classList.remove("playing");
+          var p = target.play();
+          if (p && typeof p.then === "function") p.catch(function () {});
+          musicBtn.classList.add("playing");
+        }
+        pos = randomPositionAvoidCenter();
+        musicBtn.style.left = pos.left + "%";
+        musicBtn.style.top = pos.top + "%";
+      }
+    });
   }
 
-  document.getElementById("linkYesterday").addEventListener("click", function (e) {
+  dom.linkYesterday.addEventListener("click", function (e) {
     e.preventDefault();
     if (viewingIndex > 1) {
       viewingIndex -= 1;
@@ -371,7 +409,7 @@
     }
   });
 
-  document.getElementById("linkTomorrow").addEventListener("click", function (e) {
+  dom.linkTomorrow.addEventListener("click", function (e) {
     e.preventDefault();
     if (viewingIndex < 8) {
       viewingIndex += 1;
@@ -393,9 +431,8 @@
   });
 
   document.body.addEventListener("dblclick", function (ev) {
-    var photoWrap = document.getElementById("photoWrap");
-    if (!photoWrap || (ev.target !== photoWrap && !ev.target.closest(".photo-wrap img"))) return;
-    var container = document.getElementById("musicHeartsFloat");
+    if (!dom.photoWrap || (ev.target !== dom.photoWrap && !ev.target.closest(".photo-wrap img"))) return;
+    var container = dom.musicHeartsFloat;
     if (!container) return;
     var hearts = container.querySelectorAll(".heart-emoji");
     for (var h = 0; h < hearts.length; h++) {
@@ -410,10 +447,11 @@
   });
 
   function injectAudioElements() {
-    var container = document.getElementById("musicHeartsFloat");
+    var container = dom.musicHeartsFloat;
     if (!container || !MUSIC_TRACKS.length) return;
     var parent = container.parentNode;
     if (!parent) return;
+    cachedAudioList.length = 0;
     var ref = container;
     for (var i = 0; i < MUSIC_TRACKS.length; i++) {
       var track = MUSIC_TRACKS[i];
@@ -422,6 +460,7 @@
       el.src = track.src;
       el.loop = true;
       parent.insertBefore(el, ref.nextSibling);
+      cachedAudioList.push(el);
       ref = el;
     }
   }

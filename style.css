@@ -129,6 +129,7 @@ body.loaded .content {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  contain: layout paint;
 }
 
 .star {
@@ -137,6 +138,7 @@ body.loaded .content {
   background: #fff;
   box-shadow: 0 0 3px rgba(255, 255, 255, 0.4);
   animation: twinkle 3s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes twinkle {
@@ -151,6 +153,7 @@ body.loaded .content {
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  contain: layout paint;
 }
 
 .float-emoji {
@@ -162,6 +165,7 @@ body.loaded .content {
   animation: rise 24s linear infinite;
   animation-delay: 0s;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  will-change: transform, opacity;
 }
 
 @keyframes rise {
@@ -199,6 +203,7 @@ body.loaded .content {
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  contain: layout paint;
 }
 
 .float-name {
@@ -214,6 +219,7 @@ body.loaded .content {
   animation: riseName 32s linear infinite;
   animation-delay: 0s;
   white-space: nowrap;
+  will-change: transform;
 }
 
 .float-name.to-name {
@@ -276,6 +282,7 @@ body.loaded .content {
   inset: 0;
   z-index: 3;
   pointer-events: none;
+  contain: layout paint;
 }
 
 .music-hearts-float .music-emoji,
