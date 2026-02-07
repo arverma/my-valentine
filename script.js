@@ -4,9 +4,8 @@
   var PERSONAL = {
     fromName: "Aman",
     toName: "Moni",
-    tagline: "Bihar · नाश्ता और रात साथ, Thar, क्रिकेट, फिल्में.",
     photoUrl: "we.jpg",
-    easterEgg: "I don't like you. I love you!"
+    easterEgg: "I love you!"
   };
 
   var DAY_GLOW = {
@@ -58,7 +57,6 @@
 
   var MUSIC_TRACKS = [
     { id: "track1", src: "music/1.webm", emoji: "🎵" },
-    { id: "track2", src: "music/2.webm", emoji: "🎶" },
     { id: "track3", src: "music/3.webm", emoji: "🎧" },
     { id: "track4", src: "music/4.webm", emoji: "🎤" }
   ];
@@ -167,7 +165,7 @@
       videoId: initialVideoId,
       playerVars: {
         autoplay: 1,
-        mute: 1,
+        mute: 0,
         playsinline: 1
       },
       events: {
@@ -186,7 +184,7 @@
       target.loadVideoById(pendingVideoId);
       pendingVideoId = null;
     }
-    target.mute();
+    target.unMute();
     target.playVideo();
   }
 
@@ -258,7 +256,7 @@
       pendingVideoId = day.videoId;
       if (ytPlayer && typeof ytPlayer.loadVideoById === "function") {
         ytPlayer.loadVideoById(day.videoId);
-        ytPlayer.mute();
+        ytPlayer.unMute();
         ytPlayer.playVideo();
         pendingVideoId = null;
       }
@@ -280,6 +278,36 @@
         confettiShown = true;
       }
     }
+  }
+
+  function showILoveYouToast() {
+    var text = PERSONAL.easterEgg || "I love you!";
+    var toast = document.createElement("div");
+    toast.className = "toast";
+    toast.setAttribute("role", "status");
+    toast.textContent = text;
+    var photoWrap = document.getElementById("photoWrap");
+    if (photoWrap) {
+      var rect = photoWrap.getBoundingClientRect();
+      toast.style.left = (rect.left + rect.width / 2) + "px";
+      toast.style.top = (rect.bottom + 12) + "px";
+    } else {
+      toast.style.left = "50%";
+      toast.style.top = "auto";
+      toast.style.bottom = "2rem";
+    }
+    document.body.appendChild(toast);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        toast.classList.add("toast-show");
+      });
+    });
+    setTimeout(function () {
+      toast.classList.remove("toast-show");
+      setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3500);
   }
 
   function fireConfetti() {
@@ -416,6 +444,13 @@
       e.preventDefault();
       viewingIndex += 1;
       render();
+    }
+  });
+
+  document.body.addEventListener("click", function (ev) {
+    var photoWrap = document.getElementById("photoWrap");
+    if (photoWrap && (ev.target === photoWrap || ev.target.closest(".photo-wrap img"))) {
+      showILoveYouToast();
     }
   });
 
