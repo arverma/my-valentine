@@ -1,0 +1,558 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --day-glow-rgb: 100, 35, 65;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #fceef2;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Loader */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a0510;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+
+body.loaded .loader {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-heart {
+  font-size: 2rem;
+  color: rgba(232, 180, 188, 0.9);
+  animation: loaderPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes loaderPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-heart {
+    animation: none;
+  }
+}
+
+/* Content wrapper – single centered column */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 34rem;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Entrance – content hidden until loaded */
+.content {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+body.loaded .content {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* World background – deep night garden with soft rose glow */
+.world-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 10%, rgba(var(--day-glow-rgb), 0.5) 0%, transparent 45%),
+    radial-gradient(ellipse 90% 100% at 85% 85%, rgba(80, 25, 50, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse 90% 100% at 15% 90%, rgba(70, 20, 45, 0.2) 0%, transparent 45%),
+    linear-gradient(165deg, #0a0510 0%, #150a18 18%, #1e0d1c 35%, #2a1225 55%, #1a0c18 75%, #0d0610 100%);
+}
+
+.world-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 100% 80% at 50% 30%, rgba(120, 40, 70, 0.45) 0%, transparent 50%);
+  animation: bgPulse 18s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bgPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-bg::before {
+    animation: none;
+    opacity: 0.45;
+  }
+}
+
+.world-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.25) 100%);
+  pointer-events: none;
+}
+
+/* Starfield */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.4);
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.15); }
+}
+
+/* Floating emojis – premium: subtle, no strong glow */
+.float-emojis {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.float-emoji {
+  position: absolute;
+  left: 50%;
+  bottom: -5%;
+  font-size: 1.2rem;
+  opacity: 0.45;
+  animation: rise 24s linear infinite;
+  animation-delay: 0s;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.45;
+  }
+  15% {
+    opacity: 0.5;
+  }
+  85% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-120vh) translateX(var(--drift, 0px)) rotate(10deg);
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-emoji {
+    animation: none;
+    opacity: 0.4;
+    bottom: 20%;
+  }
+  .star {
+    animation: none;
+  }
+}
+
+/* Floating names – Aman, Moni in typography */
+.float-names {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.float-name {
+  position: absolute;
+  left: 50%;
+  bottom: -10%;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  color: rgba(255, 240, 248, 0.38);
+  animation: riseName 32s linear infinite;
+  animation-delay: 0s;
+  white-space: nowrap;
+}
+
+.float-name.to-name {
+  color: rgba(255, 220, 235, 0.4);
+  letter-spacing: 0.15em;
+}
+
+@keyframes riseName {
+  0% {
+    transform: translate(-50%, 0) translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.35;
+  }
+  20% {
+    opacity: 0.45;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, 0) translateY(-130vh) translateX(var(--drift, 0px)) rotate(-5deg);
+    opacity: 0.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-name {
+    animation: none;
+    opacity: 0.3;
+    bottom: 15%;
+  }
+}
+
+/* Music + heart float layer */
+.music-hearts-float {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.music-hearts-float .music-emoji,
+.music-hearts-float .heart-emoji {
+  pointer-events: auto;
+  position: absolute;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  transition: left 0.4s ease, top 0.4s ease, transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.music-hearts-float .music-emoji:hover,
+.music-hearts-float .heart-emoji:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.music-hearts-float .music-emoji.playing {
+  background: rgba(255, 220, 235, 0.2);
+  box-shadow: 0 0 16px rgba(232, 180, 188, 0.4);
+}
+
+/* Heart burst – party popper style */
+.heart-burst-wrap {
+  position: fixed;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.heart-burst-particle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+  animation: heartBurst 2.4s ease-out forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-burst-particle {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Main – layout: mobile stacked, desktop left photo+day / right video */
+.main {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  padding: 1.25rem 1rem;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.main-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.main-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.day-meta {
+  font-size: 0.85rem;
+  color: rgba(255, 220, 235, 0.7);
+  margin: 0;
+}
+
+.day-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--day-glow, #e8b4bc);
+  margin: 0;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 20px var(--day-glow-shadow, rgba(232, 180, 188, 0.3));
+}
+
+.video-wrap {
+  margin: 0;
+  max-width: 320px;
+  aspect-ratio: 9 / 16;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#ytPlayer {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.video-wrap iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+  border-radius: 12px;
+}
+
+.video-placeholder {
+  font-family: "Noto Serif Devanagari", serif;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: rgba(255, 248, 250, 0.95);
+  margin: 0;
+  max-width: 28rem;
+  text-align: center;
+  display: none;
+}
+
+.nav {
+  margin: 0;
+}
+
+.link-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.link-nav:hover {
+  color: #f0c8d0;
+  transform: scale(1.08);
+}
+
+.nav-sep {
+  display: inline-block;
+  width: 0.5rem;
+}
+
+.link-yesterday:hover,
+.link-tomorrow:hover {
+  text-decoration: none;
+}
+
+/* Photo */
+.photo-wrap {
+  margin: 0;
+  z-index: 2;
+  text-align: center;
+}
+
+.photo-wrap .photo {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Confetti */
+.confetti-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-particle {
+  position: absolute;
+  left: 50%;
+  bottom: 30%;
+  width: 10px;
+  height: 10px;
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+  animation: confettiBurst 2.5s ease-out forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes confettiBurst {
+  0% {
+    transform: translate(-50%, 0) translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 0) translate(var(--tx), var(--ty)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-particle {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: 2.5rem 2rem;
+  }
+  .main-layout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    max-width: 100%;
+  }
+  .main-left {
+    flex: 1;
+    min-width: 0;
+    max-width: 50%;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+  .main-left .day-meta {
+    font-size: 1.1rem;
+  }
+  .main-left .day-label {
+    font-size: 1.75rem;
+  }
+  .main-right {
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+  .main-right .video-wrap {
+    margin-top: 0;
+  }
+  .main-left .photo-wrap .photo {
+    width: 16rem;
+    height: 16rem;
+  }
+  .video-wrap {
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .main {
+    padding: 2rem 1.25rem;
+  }
+  .main-layout {
+    gap: 1.75rem;
+  }
+  .photo-wrap .photo {
+    width: 6.5rem;
+    height: 6.5rem;
+  }
+  .video-wrap {
+    max-width: 360px;
+  }
+}

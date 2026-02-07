@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valentine Week — Aman & Moni</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%238b4352' d='M16 28C16 28 4 18 4 12c0-4 4-8 8-8 2 0 4 2 4 2s2-2 4-2c4 0 8 4 8 8 0 6-12 16-12 16z'/%3E%3C/svg%3E" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="loader" id="loader" aria-hidden="true"><span class="loader-heart">❤️</span></div>
+  <div class="world-bg" aria-hidden="true"></div>
+  <div class="starfield" id="starfield" aria-hidden="true"></div>
+  <div class="float-emojis" id="floatEmojis" aria-hidden="true"></div>
+  <div class="float-names" id="floatNames" aria-hidden="true"></div>
+
+  <div class="music-hearts-float" id="musicHeartsFloat" aria-hidden="true"></div>
+  <audio id="track1" src="music/1.webm" loop></audio>
+  <audio id="track2" src="music/2.webm" loop></audio>
+  <audio id="track3" src="music/3.webm" loop></audio>
+  <audio id="track4" src="music/4.webm" loop></audio>
+
+  <div class="content">
+    <main class="main">
+      <div class="main-layout">
+        <div class="main-left">
+          <div class="photo-wrap" id="photoWrap" aria-hidden="true"></div>
+          <p class="day-meta" id="dayMeta"></p>
+          <p class="day-label" id="dayLabel"></p>
+        </div>
+        <div class="main-right">
+          <div class="video-wrap" id="videoWrap">
+            <div id="ytPlayer"></div>
+          </div>
+          <p class="video-placeholder" id="videoPlaceholder"></p>
+          <nav class="nav">
+            <a href="#" class="link-nav link-yesterday" id="linkYesterday" style="display: none;" aria-label="Previous day" title="Previous day">‹</a>
+            <span class="nav-sep" id="navSep" style="display: none;"></span>
+            <a href="#" class="link-nav link-tomorrow" id="linkTomorrow" style="display: none;" aria-label="Next day" title="Next day">›</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    var tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
+</body>
+</html>
