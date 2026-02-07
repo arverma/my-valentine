@@ -1,76 +1,35 @@
 (function () {
   "use strict";
 
-  var PERSONAL = {
-    fromName: "Aman",
-    toName: "Moni",
-    photoUrl: "images/we.jpg",
-    easterEgg: "I love you!"
-  };
+  var CONFIG = window.VALENTINE_CONFIG || {};
+  var PERSONAL = CONFIG.personal || {};
+  var DAYS = (CONFIG.days && CONFIG.days.length) ? CONFIG.days : [{ nameEn: "", date: 7, videoId: "" }];
+  var EMOJI_CONFIG = CONFIG.emojiConfig || { 1: ["❤️"] };
 
-  var DAY_GLOW = {
-    1: "#b84060",
-    2: "#c44d6c",
-    3: "#a06050",
-    4: "#d07080",
-    5: "#c09050",
-    6: "#c85a5a",
-    7: "#b05070",
-    8: "#d04060"
-  };
+  var EMOJI_COUNT = CONFIG.emojiCount;
+  var fd = CONFIG.floatEmojiDuration || {};
+  var FLOAT_EMOJI_DURATION_MIN = fd.min;
+  var FLOAT_EMOJI_DURATION_MAX = fd.max;
+  var FLOAT_EMOJI_DELAY_MAX = CONFIG.floatEmojiDelayMax;
+  var MUSIC_TRACKS = CONFIG.musicTracks || [];
+  var yhc = CONFIG.yellowHeartCount || {};
+  var YELLOW_HEART_COUNT_MIN = yhc.min;
+  var YELLOW_HEART_COUNT_MAX = yhc.max;
+  var RED_HEART_BURST = CONFIG.heartBurst || {};
 
-  function hexToRgb(hex) {
-    var n = parseInt(hex.slice(1), 16);
-    return (n >> 16) + ", " + ((n >> 8) & 255) + ", " + (n & 255);
+  function secureRandom() {
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      return crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000;
+    }
+    return Math.random();
   }
 
-  var DAYS = [
-    { nameEn: "Rose Day", date: 7, videoId: "oDSfEuErIEc" },
-    { nameEn: "Propose Day", date: 8, videoId: "RnObnYXbJr8" },
-    { nameEn: "Chocolate Day", date: 9, videoId: "h2tv4PmSaKU" },
-    { nameEn: "Teddy Day", date: 10, videoId: "Bxl2MunBIt8" },
-    { nameEn: "Promise Day", date: 11, videoId: "43VHF4Q6wfU" },
-    { nameEn: "Hug Day", date: 12, videoId: "BwGQIv_m_wg" },
-    { nameEn: "Kiss Day", date: 13, videoId: "1i0Jo8ml2pg" },
-    { nameEn: "Valentine's Day", date: 14, videoId: "yYHGvhs06Xc" }
-  ];
-
-  /**
-   * Emojis per Valentine's week day (1 = Rose Day … 8 = Valentine's Day).
-   * Edit this to change or add emojis for each day.
-   */
-  var EMOJI_CONFIG = {
-    1: ["🌹", "🌷", "❤️"],
-    2: ["❤️", "💕", "💗", "💖", "💝", "💍"],
-    3: ["🍫", "🍬", "💕", "❤️"],
-    4: ["🧸", "❤️", "💕"],
-    5: ["💝", "🤝", "❤️", "💕", "⭐"],
-    6: ["🤗", "❤️", "💕", "🫂"],
-    7: ["💋", "❤️", "💕", "💗"],
-    8: ["❤️", "💕", "💗", "💖", "🌹", "💝", "🌷"]
-  };
-
-  var EMOJI_COUNT = 20;
-  var FLOAT_EMOJI_DURATION_MIN = 22;
-  var FLOAT_EMOJI_DURATION_MAX = 28;
-  var FLOAT_EMOJI_DELAY_MAX = 28;
-
-  var MUSIC_TRACKS = [
-    { id: "track1", src: "music/1.webm", emoji: "🎵" },
-    { id: "track3", src: "music/3.webm", emoji: "🎧" },
-    { id: "track4", src: "music/4.webm", emoji: "🎤" }
-  ];
-
-  var YELLOW_HEART_COUNT_MIN = 3;
-  var YELLOW_HEART_COUNT_MAX = 5;
-  var RED_HEART_BURST = { emoji: "❤️", color: "#e74c3c" };
-
   function randomBetween(min, max) {
-    return min + Math.random() * (max - min);
+    return min + secureRandom() * (max - min);
   }
 
   function pickRandom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+    return arr[Math.floor(secureRandom() * arr.length)];
   }
 
   function randomPositionAvoidCenter() {
@@ -89,7 +48,7 @@
     var container = document.getElementById("floatNames");
     if (!container || !PERSONAL.fromName || !PERSONAL.toName) return;
     var names = [PERSONAL.fromName, PERSONAL.toName];
-    var count = 10;
+    var count = CONFIG.floatNamesCount != null ? CONFIG.floatNamesCount : 10;
     for (var i = 0; i < count; i++) {
       var span = document.createElement("span");
       span.className = "float-name " + (i % 2 === 0 ? "from-name" : "to-name");
@@ -111,7 +70,7 @@
   function initStarfield() {
     var container = document.getElementById("starfield");
     if (!container) return;
-    var count = 60;
+    var count = CONFIG.starCount != null ? CONFIG.starCount : 60;
     for (var i = 0; i < count; i++) {
       var star = document.createElement("span");
       star.className = "star";
@@ -128,12 +87,12 @@
     var container = document.getElementById("floatEmojis");
     var list = EMOJI_CONFIG[dayIndex] || EMOJI_CONFIG[1];
     container.innerHTML = "";
-    for (var i = 0; i < EMOJI_COUNT; i++) {
+    for (var i = 0; i < (EMOJI_COUNT != null ? EMOJI_COUNT : 20); i++) {
       var span = document.createElement("span");
       span.className = "float-emoji";
       var x = randomBetween(1, 99);
-      var duration = randomBetween(FLOAT_EMOJI_DURATION_MIN, FLOAT_EMOJI_DURATION_MAX);
-      var delay = -randomBetween(0, FLOAT_EMOJI_DELAY_MAX);
+      var duration = randomBetween(FLOAT_EMOJI_DURATION_MIN != null ? FLOAT_EMOJI_DURATION_MIN : 22, FLOAT_EMOJI_DURATION_MAX != null ? FLOAT_EMOJI_DURATION_MAX : 28);
+      var delay = -randomBetween(0, FLOAT_EMOJI_DELAY_MAX != null ? FLOAT_EMOJI_DELAY_MAX : 28);
       var drift = randomBetween(-20, 20);
       span.setAttribute("style",
         "left: " + x + "%; " +
@@ -208,14 +167,6 @@
     document.querySelectorAll(".music-emoji").forEach(function (b) { b.classList.remove("playing"); });
   }
 
-  function setDayGlow(dayIndex) {
-    var color = DAY_GLOW[dayIndex] || DAY_GLOW[1];
-    var rgb = hexToRgb(color);
-    document.documentElement.style.setProperty("--day-glow", color);
-    document.documentElement.style.setProperty("--day-glow-rgb", rgb);
-    document.documentElement.style.setProperty("--day-glow-shadow", "rgba(" + rgb + ", 0.35)");
-  }
-
   function render() {
     var dayMetaEl = document.getElementById("dayMeta");
     var dayLabelEl = document.getElementById("dayLabel");
@@ -235,29 +186,27 @@
     }
 
     if (todayIndex === 0 && viewingIndex === 1) {
-      setDayGlow(1);
       renderEmojis(1);
       dayMetaEl.textContent = "";
       dayLabelEl.textContent = "";
       if (videoWrap) videoWrap.style.display = "none";
       if (videoPlaceholder) {
-        videoPlaceholder.textContent = "वैलेंटाइन वीक जल्द आ रहा है।";
+        videoPlaceholder.textContent = (CONFIG.page && CONFIG.page.comingSoonMessage) || "";
         videoPlaceholder.style.display = "block";
       }
       linkYesterdayEl.style.display = "none";
-      navSepEl.style.display = "none";
-      linkTomorrowEl.style.display = "none";
+      navSepEl.style.display = "inline";
+      linkTomorrowEl.style.display = "inline";
       return;
     }
 
     if (todayIndex === 9 && viewingIndex === 8) {
-      setDayGlow(8);
       renderEmojis(8);
       dayMetaEl.textContent = "";
       dayLabelEl.textContent = "";
       if (videoWrap) videoWrap.style.display = "none";
       if (videoPlaceholder) {
-        videoPlaceholder.textContent = "अगले साल मिलते हैं।";
+        videoPlaceholder.textContent = (CONFIG.page && CONFIG.page.pastWeekMessage) || "";
         videoPlaceholder.style.display = "block";
       }
       linkYesterdayEl.style.display = "inline";
@@ -267,11 +216,10 @@
     }
 
     if (viewingIndex >= 1 && viewingIndex <= 8) {
-      setDayGlow(viewingIndex);
       renderEmojis(viewingIndex);
       var day = DAYS[viewingIndex - 1];
       dayMetaEl.textContent = "";
-      dayLabelEl.textContent = day.nameEn + " — " + day.date + " February";
+      dayLabelEl.textContent = day.nameEn + " : " + day.date + " February";
       if (videoPlaceholder) videoPlaceholder.style.display = "none";
       if (videoWrap) videoWrap.style.display = "block";
       pendingVideoId = day.videoId;
@@ -287,8 +235,13 @@
       } else {
         linkYesterdayEl.style.display = "none";
       }
-      linkTomorrowEl.style.display = "none";
-      navSepEl.style.display = "none";
+      if (viewingIndex < 8) {
+        linkTomorrowEl.style.display = "inline";
+        navSepEl.style.display = viewingIndex > 1 ? "inline" : "none";
+      } else {
+        linkTomorrowEl.style.display = "none";
+        navSepEl.style.display = "inline";
+      }
       if (viewingIndex === 8 && !confettiShown && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         fireConfetti();
         confettiShown = true;
@@ -296,38 +249,10 @@
     }
   }
 
-  function showILoveYouToast() {
-    var text = PERSONAL.easterEgg || "I love you!";
-    var toast = document.createElement("div");
-    toast.className = "toast";
-    toast.setAttribute("role", "status");
-    toast.textContent = text;
-    var photoWrap = document.getElementById("photoWrap");
-    if (photoWrap) {
-      var rect = photoWrap.getBoundingClientRect();
-      toast.style.left = (rect.left + rect.width / 2) + "px";
-      toast.style.top = (rect.bottom + 12) + "px";
-    } else {
-      toast.style.left = "50%";
-      toast.style.top = "auto";
-      toast.style.bottom = "2rem";
-    }
-    document.body.appendChild(toast);
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        toast.classList.add("toast-show");
-      });
-    });
-    setTimeout(function () {
-      toast.classList.remove("toast-show");
-      setTimeout(function () { removeEl(toast); }, 300);
-    }, 3500);
-  }
-
   function fireConfetti() {
     var wrap = document.createElement("div");
     wrap.className = "confetti-wrap";
-    var count = 30;
+    var count = CONFIG.confettiCount != null ? CONFIG.confettiCount : 30;
     for (var i = 0; i < count; i++) {
       var p = document.createElement("span");
       p.className = "confetti-particle";
@@ -350,7 +275,7 @@
     wrap.style.left = originX + "px";
     wrap.style.top = originY + "px";
     wrap.style.transform = "translate(-50%, -50%)";
-    var count = 25;
+    var count = CONFIG.heartBurstParticleCount != null ? CONFIG.heartBurstParticleCount : 25;
     for (var i = 0; i < count; i++) {
       var p = document.createElement("span");
       p.className = "heart-burst-particle";
@@ -364,6 +289,26 @@
     }
     document.body.appendChild(wrap);
     setTimeout(function () { removeEl(wrap); }, 2600);
+  }
+
+  function addYellowHeart(container) {
+    if (!container) return;
+    var pos = randomPositionAvoidCenter();
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "heart-emoji";
+    btn.setAttribute("aria-label", "Heart burst");
+    btn.textContent = "💛";
+    btn.style.left = pos.left + "%";
+    btn.style.top = pos.top + "%";
+    btn.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      fireHeartBurst(ev.clientX, ev.clientY, RED_HEART_BURST.color || "#e74c3c", RED_HEART_BURST.emoji || "\u2764\ufe0f");
+      removeEl(ev.currentTarget);
+      addYellowHeart(container);
+      addYellowHeart(container);
+    });
+    container.appendChild(btn);
   }
 
   function initMusicHeartsFloat() {
@@ -410,24 +355,11 @@
       btn.setAttribute("data-track-id", trackId);
       container.appendChild(btn);
     }
-    var yellowHeartCount = YELLOW_HEART_COUNT_MIN + Math.floor(Math.random() * (YELLOW_HEART_COUNT_MAX - YELLOW_HEART_COUNT_MIN + 1));
+    var yMin = YELLOW_HEART_COUNT_MIN != null ? YELLOW_HEART_COUNT_MIN : 3;
+    var yMax = YELLOW_HEART_COUNT_MAX != null ? YELLOW_HEART_COUNT_MAX : 5;
+    var yellowHeartCount = yMin + Math.floor(secureRandom() * (yMax - yMin + 1));
     for (i = 0; i < yellowHeartCount; i++) {
-      pos = randomPositionAvoidCenter();
-      btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "heart-emoji";
-      btn.setAttribute("aria-label", "Heart burst");
-      btn.textContent = "💛";
-      btn.style.left = pos.left + "%";
-      btn.style.top = pos.top + "%";
-      btn.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        fireHeartBurst(ev.clientX, ev.clientY, RED_HEART_BURST.color, RED_HEART_BURST.emoji);
-        pos = randomPositionAvoidCenter();
-        ev.currentTarget.style.left = pos.left + "%";
-        ev.currentTarget.style.top = pos.top + "%";
-      });
-      container.appendChild(btn);
+      addYellowHeart(container);
     }
   }
 
@@ -453,16 +385,55 @@
       e.preventDefault();
       viewingIndex -= 1;
       render();
+    } else if (e.key === "ArrowRight" && viewingIndex < 8) {
+      e.preventDefault();
+      viewingIndex += 1;
+      render();
     }
   });
 
-  document.body.addEventListener("click", function (ev) {
+  document.body.addEventListener("dblclick", function (ev) {
     var photoWrap = document.getElementById("photoWrap");
-    if (photoWrap && (ev.target === photoWrap || ev.target.closest(".photo-wrap img"))) {
-      showILoveYouToast();
+    if (!photoWrap || (ev.target !== photoWrap && !ev.target.closest(".photo-wrap img"))) return;
+    var container = document.getElementById("musicHeartsFloat");
+    if (!container) return;
+    var hearts = container.querySelectorAll(".heart-emoji");
+    for (var h = 0; h < hearts.length; h++) {
+      removeEl(hearts[h]);
+    }
+    var yMin = YELLOW_HEART_COUNT_MIN != null ? YELLOW_HEART_COUNT_MIN : 3;
+    var yMax = YELLOW_HEART_COUNT_MAX != null ? YELLOW_HEART_COUNT_MAX : 5;
+    var yellowHeartCount = yMin + Math.floor(secureRandom() * (yMax - yMin + 1));
+    for (var i = 0; i < yellowHeartCount; i++) {
+      addYellowHeart(container);
     }
   });
 
+  function injectAudioElements() {
+    var container = document.getElementById("musicHeartsFloat");
+    if (!container || !MUSIC_TRACKS.length) return;
+    var parent = container.parentNode;
+    if (!parent) return;
+    var ref = container;
+    for (var i = 0; i < MUSIC_TRACKS.length; i++) {
+      var track = MUSIC_TRACKS[i];
+      var el = document.createElement("audio");
+      el.id = track.id;
+      el.src = track.src;
+      el.loop = true;
+      parent.insertBefore(el, ref.nextSibling);
+      ref = el;
+    }
+  }
+
+  if (CONFIG.page && CONFIG.page.title) {
+    document.title = CONFIG.page.title;
+  }
+  if (CONFIG.page && CONFIG.page.lang) {
+    document.documentElement.lang = CONFIG.page.lang;
+  }
+
+  injectAudioElements();
   initStarfield();
   initFloatNames();
   initMusicHeartsFloat();

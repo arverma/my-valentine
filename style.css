@@ -298,6 +298,15 @@ body.loaded .content {
   transition: left 0.4s ease, top 0.4s ease, transform 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
+.music-hearts-float .music-emoji {
+  z-index: 2;
+  color: #fff;
+}
+
+.music-hearts-float .heart-emoji {
+  z-index: 1;
+}
+
 .music-hearts-float .music-emoji:hover,
 .music-hearts-float .heart-emoji:hover {
   background: rgba(255, 255, 255, 0.14);
@@ -390,11 +399,31 @@ body.loaded .content {
 .day-label {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--day-glow, #e8b4bc);
+  color: #c87888;
   margin: 0;
   letter-spacing: 0.03em;
-  text-shadow: 0 0 20px var(--day-glow-shadow, rgba(232, 180, 188, 0.3));
+  text-shadow:
+    0 0 12px rgba(200, 120, 136, 0.9),
+    0 0 28px rgba(200, 120, 136, 0.7),
+    0 0 50px rgba(200, 120, 136, 0.5);
+  filter: drop-shadow(0 0 8px rgba(200, 120, 136, 0.9)) drop-shadow(0 0 25px rgba(200, 120, 136, 0.7));
   white-space: nowrap;
+  animation: dayLabelGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes dayLabelGlow {
+  0%, 100% {
+    text-shadow: 0 0 14px rgba(200, 120, 136, 0.75), 0 0 32px rgba(200, 120, 136, 0.55), 0 0 60px rgba(200, 120, 136, 0.4);
+  }
+  50% {
+    text-shadow: 0 0 22px rgba(200, 120, 136, 0.95), 0 0 45px rgba(200, 120, 136, 0.7), 0 0 75px rgba(200, 120, 136, 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-label {
+    animation: none;
+  }
 }
 
 .video-wrap {
@@ -421,7 +450,7 @@ body.loaded .content {
 }
 
 .video-placeholder {
-  font-family: "Noto Serif Devanagari", serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 1.25rem;
   line-height: 1.6;
   color: rgba(255, 248, 250, 0.95);
@@ -476,8 +505,24 @@ body.loaded .content {
   height: 5.5rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid #c87888;
+  box-shadow: 0 0 20px rgba(200, 120, 136, 0.5), 0 0 40px rgba(200, 120, 136, 0.3), 0 4px 20px rgba(0, 0, 0, 0.25);
+  animation: photoGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes photoGlow {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(200, 120, 136, 0.45), 0 0 35px rgba(200, 120, 136, 0.25), 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(200, 120, 136, 0.65), 0 0 50px rgba(200, 120, 136, 0.4), 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-wrap .photo {
+    animation: none;
+  }
 }
 
 /* Confetti */
