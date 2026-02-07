@@ -4,7 +4,7 @@
   var PERSONAL = {
     fromName: "Aman",
     toName: "Moni",
-    photoUrl: "we.jpg",
+    photoUrl: "images/we.jpg",
     easterEgg: "I love you!"
   };
 
@@ -79,6 +79,10 @@
     if (left >= 40 && left <= 60) left = left < 50 ? 35 : 65;
     if (top >= 30 && top <= 70) top = top < 50 ? 25 : 75;
     return { left: left, top: top };
+  }
+
+  function removeEl(el) {
+    if (el && el.parentNode) el.parentNode.removeChild(el);
   }
 
   function initFloatNames() {
@@ -169,7 +173,8 @@
         playsinline: 1
       },
       events: {
-        onReady: onYTPlayerReady
+        onReady: onYTPlayerReady,
+        onStateChange: onYTStateChange
       }
     });
     var iframe = document.getElementById("ytPlayer");
@@ -188,11 +193,27 @@
     target.playVideo();
   }
 
+  function onYTStateChange(event) {
+    if (event.data === 1) {
+      pauseAllMusic();
+    }
+  }
+
+  function pauseAllMusic() {
+    var allAudios = document.querySelectorAll(".music-hearts-float ~ audio");
+    for (var i = 0; i < allAudios.length; i++) {
+      allAudios[i].pause();
+      allAudios[i].currentTime = 0;
+    }
+    document.querySelectorAll(".music-emoji").forEach(function (b) { b.classList.remove("playing"); });
+  }
+
   function setDayGlow(dayIndex) {
     var color = DAY_GLOW[dayIndex] || DAY_GLOW[1];
+    var rgb = hexToRgb(color);
     document.documentElement.style.setProperty("--day-glow", color);
-    document.documentElement.style.setProperty("--day-glow-rgb", hexToRgb(color));
-    document.documentElement.style.setProperty("--day-glow-shadow", "rgba(" + hexToRgb(color) + ", 0.35)");
+    document.documentElement.style.setProperty("--day-glow-rgb", rgb);
+    document.documentElement.style.setProperty("--day-glow-shadow", "rgba(" + rgb + ", 0.35)");
   }
 
   function render() {
@@ -201,6 +222,8 @@
     var videoWrap = document.getElementById("videoWrap");
     var videoPlaceholder = document.getElementById("videoPlaceholder");
     var linkYesterdayEl = document.getElementById("linkYesterday");
+    var linkTomorrowEl = document.getElementById("linkTomorrow");
+    var navSepEl = document.getElementById("navSep");
     var photoWrap = document.getElementById("photoWrap");
 
     if (PERSONAL.photoUrl) {
@@ -222,8 +245,8 @@
         videoPlaceholder.style.display = "block";
       }
       linkYesterdayEl.style.display = "none";
-      document.getElementById("navSep").style.display = "none";
-      document.getElementById("linkTomorrow").style.display = "none";
+      navSepEl.style.display = "none";
+      linkTomorrowEl.style.display = "none";
       return;
     }
 
@@ -238,8 +261,8 @@
         videoPlaceholder.style.display = "block";
       }
       linkYesterdayEl.style.display = "inline";
-      document.getElementById("navSep").style.display = "inline";
-      document.getElementById("linkTomorrow").style.display = "none";
+      navSepEl.style.display = "inline";
+      linkTomorrowEl.style.display = "none";
       return;
     }
 
@@ -247,8 +270,6 @@
       setDayGlow(viewingIndex);
       renderEmojis(viewingIndex);
       var day = DAYS[viewingIndex - 1];
-      var linkTomorrowEl = document.getElementById("linkTomorrow");
-      var navSepEl = document.getElementById("navSep");
       dayMetaEl.textContent = "";
       dayLabelEl.textContent = day.nameEn + " — " + day.date + " February";
       if (videoPlaceholder) videoPlaceholder.style.display = "none";
@@ -299,9 +320,7 @@
     });
     setTimeout(function () {
       toast.classList.remove("toast-show");
-      setTimeout(function () {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 300);
+      setTimeout(function () { removeEl(toast); }, 300);
     }, 3500);
   }
 
@@ -321,9 +340,7 @@
       wrap.appendChild(p);
     }
     document.body.appendChild(wrap);
-    setTimeout(function () {
-      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-    }, 2800);
+    setTimeout(function () { removeEl(wrap); }, 2800);
   }
 
   function fireHeartBurst(originX, originY, color, emoji) {
@@ -346,9 +363,7 @@
       wrap.appendChild(p);
     }
     document.body.appendChild(wrap);
-    setTimeout(function () {
-      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-    }, 2600);
+    setTimeout(function () { removeEl(wrap); }, 2600);
   }
 
   function initMusicHeartsFloat() {
@@ -375,6 +390,9 @@
           target.currentTime = 0;
           ev.currentTarget.classList.remove("playing");
         } else {
+          if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+            ytPlayer.pauseVideo();
+          }
           var allAudios = document.querySelectorAll(".music-hearts-float ~ audio");
           for (var j = 0; j < allAudios.length; j++) {
             allAudios[j].pause();
